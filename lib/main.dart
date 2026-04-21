@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'theme.dart';
+import 'models/user_profile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -14,12 +16,9 @@ class ZeliosApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Zélios',
+      title: 'Sona',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF3DBE6E)),
-        useMaterial3: true,
-      ),
+      theme: SonaTheme.theme,
       home: const SplashScreen(),
     );
   }
@@ -76,16 +75,17 @@ class _SplashScreenState extends State<SplashScreen> {
       return;
     }
 
+    final profile = UserProfile(
+      prenom: prenom,
+      sexe: _sexe,
+      age: age!,
+      poids: poids!,
+      taille: taille!,
+    );
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => CameraScreen(
-          prenom: prenom,
-          sexe: _sexe,
-          age: age!,
-          poids: poids!,
-          taille: taille!,
-        ),
+        builder: (_) => CameraScreen(profile: profile),
       ),
     );
   }
@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFE8F5EE),
+      backgroundColor: SonaColors.primaryLight,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
@@ -126,17 +126,17 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 16),
               // Nom app
               const Text(
-                'ZÉLIOS',
+                'Sona',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
-                  color: Color(0xFF3DBE6E),
+                  color: SonaColors.primary,
                   letterSpacing: 3,
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Faisons connaissance',
+                'Commençons ensemble',
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w800,
@@ -147,7 +147,7 @@ class _SplashScreenState extends State<SplashScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 40),
                 child: Text(
-                  'Et si tu pouvais te voir dans 3 mois ?',
+                  'Toi, dans 3 mois.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
@@ -200,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               padding: const EdgeInsets.symmetric(vertical: 10),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? const Color(0xFF3DBE6E)
+                                    ? SonaColors.primary
                                     : const Color(0xFFF0F7F3),
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -282,13 +282,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   child: ElevatedButton(
                     onPressed: () => _validerEtContinuer(context),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF3DBE6E),
+                      backgroundColor: SonaColors.primary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
                       elevation: 4,
                       shadowColor:
-                          const Color(0xFF3DBE6E).withOpacity(0.4),
+                          SonaColors.primary.withOpacity(0.4),
                     ),
                     child: const Text(
                       'C\'est parti ! 🚀',
@@ -372,19 +372,11 @@ class _SplashScreenState extends State<SplashScreen> {
 }
 
 class CameraScreen extends StatefulWidget {
-  final String prenom;
-  final String sexe;
-  final int age;
-  final double poids;
-  final double taille;
+  final UserProfile profile;
 
   const CameraScreen({
     super.key,
-    this.prenom = '',
-    this.sexe = 'Autre',
-    this.age = 25,
-    this.poids = 70,
-    this.taille = 170,
+    required this.profile,
   });
 
   @override
@@ -450,11 +442,7 @@ class _CameraScreenState extends State<CameraScreen>
           MaterialPageRoute(
             builder: (_) => ConfirmationScreen(
               file: file,
-              prenom: widget.prenom,
-              sexe: widget.sexe,
-              age: widget.age,
-              poids: widget.poids,
-              taille: widget.taille,
+              profile: widget.profile,
             ),
           ),
         );
@@ -492,7 +480,7 @@ class _CameraScreenState extends State<CameraScreen>
               openAppSettings();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF3DBE6E),
+              backgroundColor: SonaColors.primary,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
             child: const Text('Ouvrir les paramètres', style: TextStyle(color: Colors.white)),
@@ -505,7 +493,7 @@ class _CameraScreenState extends State<CameraScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: SonaColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -528,8 +516,8 @@ class _CameraScreenState extends State<CameraScreen>
                 child: Column(
                   children: [
                     Text(
-                      widget.prenom.isNotEmpty
-                          ? 'À toi de jouer, ${widget.prenom} !'
+                      widget.profile.prenom.isNotEmpty
+                          ? 'À toi de jouer, ${widget.profile.prenom} !'
                           : 'Capturez votre posture',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
@@ -540,8 +528,8 @@ class _CameraScreenState extends State<CameraScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      widget.prenom.isNotEmpty
-                          ? 'Prêt(e) à te voir évoluer, ${widget.prenom} ?\nPlace-toi au centre du cadre.'
+                      widget.profile.prenom.isNotEmpty
+                          ? 'Prêt(e) à te voir évoluer, ${widget.profile.prenom} ?\nPlace-toi au centre du cadre.'
                           : 'Placez-vous bien au centre du cadre\npour une analyse 3D précise.',
                       textAlign: TextAlign.center,
                       style: const TextStyle(
@@ -601,7 +589,7 @@ class _CameraScreenState extends State<CameraScreen>
           TextButton(
             onPressed: () {},
             style: TextButton.styleFrom(
-              foregroundColor: const Color(0xFF3DBE6E),
+              foregroundColor: SonaColors.primary,
             ),
             child: const Text(
               'Ignorer',
@@ -618,7 +606,7 @@ class _CameraScreenState extends State<CameraScreen>
       borderRadius: BorderRadius.circular(24),
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F5EE),
+          color: SonaColors.primaryLight,
           borderRadius: BorderRadius.circular(24),
         ),
         child: Stack(
@@ -651,9 +639,9 @@ class _CameraScreenState extends State<CameraScreen>
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                             colors: [
-                              const Color(0xFF3DBE6E).withOpacity(0),
-                              const Color(0xFF3DBE6E).withOpacity(0.28),
-                              const Color(0xFF3DBE6E).withOpacity(0),
+                              SonaColors.primary.withOpacity(0),
+                              SonaColors.primary.withOpacity(0.28),
+                              SonaColors.primary.withOpacity(0),
                             ],
                           ),
                         ),
@@ -665,7 +653,7 @@ class _CameraScreenState extends State<CameraScreen>
                       right: 0,
                       child: Container(
                         height: 2.5,
-                        color: const Color(0xFF3DBE6E),
+                        color: SonaColors.primary,
                       ),
                     ),
                   ]);
@@ -689,7 +677,7 @@ class _CameraScreenState extends State<CameraScreen>
       height: 20,
       child: CustomPaint(
         painter: _CornerPainter(
-          color: const Color(0xFF3DBE6E),
+          color: SonaColors.primary,
           thickness: 3,
           topLeft: topLeft,
           topRight: topRight,
@@ -716,7 +704,7 @@ class _CameraScreenState extends State<CameraScreen>
             height: 60,
             decoration: const BoxDecoration(
               shape: BoxShape.circle,
-              color: Color(0xFF3DBE6E),
+              color: SonaColors.primary,
             ),
           ),
         ),
@@ -745,7 +733,7 @@ class _SilhouettePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF3DBE6E)
+      ..color = SonaColors.primary
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -916,7 +904,7 @@ class _SheetOption extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFFF5F5F5),
+          color: SonaColors.background,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(
@@ -925,10 +913,10 @@ class _SheetOption extends StatelessWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFFE8F5EE),
+                color: SonaColors.primaryLight,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(icon, color: const Color(0xFF3DBE6E), size: 22),
+              child: Icon(icon, color: SonaColors.primary, size: 22),
             ),
             const SizedBox(width: 16),
             Text(
@@ -948,26 +936,18 @@ class _SheetOption extends StatelessWidget {
 
 class ConfirmationScreen extends StatelessWidget {
   final XFile file;
-  final String prenom;
-  final String sexe;
-  final int age;
-  final double poids;
-  final double taille;
+  final UserProfile profile;
 
   const ConfirmationScreen({
     super.key,
     required this.file,
-    required this.prenom,
-    required this.sexe,
-    required this.age,
-    required this.poids,
-    required this.taille,
+    required this.profile,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: SonaColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -1065,8 +1045,8 @@ class ConfirmationScreen extends StatelessWidget {
                           child: OutlinedButton(
                             onPressed: () => Navigator.pop(context),
                             style: OutlinedButton.styleFrom(
-                              foregroundColor: const Color(0xFF3DBE6E),
-                              side: const BorderSide(color: Color(0xFF3DBE6E), width: 1.5),
+                              foregroundColor: SonaColors.primary,
+                              side: const BorderSide(color: SonaColors.primary, width: 1.5),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
                               ),
@@ -1085,16 +1065,12 @@ class ConfirmationScreen extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (_) => ProgrammeScreen(
-                                  prenom: prenom,
-                                  age: age,
-                                  poids: poids,
-                                  taille: taille,
-                                  photoPath: file.path,
+                                  profile: profile.copyWith(photoPath: file.path),
                                 ),
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF3DBE6E),
+                              backgroundColor: SonaColors.primary,
                               foregroundColor: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -1148,7 +1124,7 @@ class _PillWidget extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
-                color: Color(0xFF3DBE6E),
+                color: SonaColors.primary,
               ),
             ),
           ),
@@ -1161,51 +1137,15 @@ class _PillWidget extends StatelessWidget {
 // ─── ÉCRAN RÉSULTAT ───────────────────────────────────────────────────────────
 
 class ResultatScreen extends StatelessWidget {
-  final String prenom;
-  final String sexe;
-  final int age;
-  final double poids;
-  final double taille;
-  final String? photoPath;
+  final UserProfile profile;
 
   const ResultatScreen({
     super.key,
-    required this.prenom,
-    required this.sexe,
-    required this.age,
-    required this.poids,
-    required this.taille,
-    this.photoPath,
+    required this.profile,
   });
 
-  String get _niveau {
-    final imc = poids / ((taille / 100) * (taille / 100));
-    if (imc >= 35) return 'douceur';
-    if (imc >= 30) return 'actif';
-    if (imc >= 25) return 'tonification';
-    return 'maintien';
-  }
-
-  double get _poidsCible {
-    switch (_niveau) {
-      case 'douceur': return poids * 0.96;
-      case 'actif': return poids * 0.94;
-      case 'tonification': return poids * 0.95;
-      default: return poids * 0.98;
-    }
-  }
-
-  Map<String, String> get _indicateurs {
-    switch (_niveau) {
-      case 'douceur': return {'souffle': '+15%', 'energie': '+20%', 'glycemie': '-8%'};
-      case 'actif': return {'souffle': '+25%', 'energie': '+35%', 'glycemie': '-12%'};
-      case 'tonification': return {'souffle': '+30%', 'energie': '+40%', 'glycemie': '-10%'};
-      default: return {'souffle': '+20%', 'energie': '+25%', 'glycemie': '-5%'};
-    }
-  }
-
   Map<String, double> get _indicateursProgress {
-    switch (_niveau) {
+    switch (profile.niveau) {
       case 'douceur': return {'souffle': 0.38, 'energie': 0.40, 'glycemie': 0.53};
       case 'actif': return {'souffle': 0.63, 'energie': 0.70, 'glycemie': 0.80};
       case 'tonification': return {'souffle': 0.75, 'energie': 0.80, 'glycemie': 0.67};
@@ -1214,7 +1154,7 @@ class ResultatScreen extends StatelessWidget {
   }
 
   List<Map<String, String>> get _programme {
-    switch (_niveau) {
+    switch (profile.niveau) {
       case 'douceur':
         return [
           {'icon': '🚶', 'text': 'Marche 20 min/jour les 2 premières semaines'},
@@ -1251,25 +1191,25 @@ class ResultatScreen extends StatelessWidget {
 
   Widget _buildPhoto(bool isAfter) {
     Widget img;
-    if (photoPath == null) {
+    if (profile.photoPath == null) {
       return Container(
         width: 150,
         height: 200,
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F5EE),
+          color: SonaColors.primaryLight,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(Icons.person, size: 60, color: Color(0xFF3DBE6E)),
+        child: const Icon(Icons.person, size: 60, color: SonaColors.primary),
       );
     }
     final useNetwork = kIsWeb ||
-        photoPath!.startsWith('blob:') ||
-        photoPath!.startsWith('http');
+        profile.photoPath!.startsWith('blob:') ||
+        profile.photoPath!.startsWith('http');
     final base = ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: useNetwork
-          ? Image.network(photoPath!, width: 150, height: 200, fit: BoxFit.cover)
-          : Image.file(File(photoPath!), width: 150, height: 200, fit: BoxFit.cover),
+          ? Image.network(profile.photoPath!, width: 150, height: 200, fit: BoxFit.cover)
+          : Image.file(File(profile.photoPath!), width: 150, height: 200, fit: BoxFit.cover),
     );
     if (!isAfter) return base;
     return Stack(
@@ -1287,7 +1227,7 @@ class ResultatScreen extends StatelessWidget {
           child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              color: const Color(0xFF3DBE6E).withOpacity(0.08),
+              color: SonaColors.primary.withOpacity(0.08),
             ),
           ),
         ),
@@ -1340,7 +1280,7 @@ class ResultatScreen extends StatelessWidget {
                         style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF3DBE6E))),
+                            color: SonaColors.primary)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -1364,14 +1304,11 @@ class ResultatScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final niveau = _niveau;
-    final poidsCible = _poidsCible;
-    final indicateurs = _indicateurs;
     final progress = _indicateursProgress;
     final programme = _programme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: SonaColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -1419,7 +1356,7 @@ class ResultatScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 7),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3DBE6E),
+                        color: SonaColors.primary,
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: const Text(
@@ -1465,7 +1402,7 @@ class ResultatScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '${poids.toStringAsFixed(1)} kg',
+                                    '${profile.poids.toStringAsFixed(1)} kg',
                                     style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -1476,14 +1413,14 @@ class ResultatScreen extends StatelessWidget {
                               const Padding(
                                 padding: EdgeInsets.symmetric(horizontal: 12),
                                 child: Icon(Icons.arrow_forward,
-                                    color: Color(0xFF3DBE6E), size: 22),
+                                    color: SonaColors.primary, size: 22),
                               ),
                               // Après
                               Column(children: [
                                 const Text('Dans 3 mois',
                                     style: TextStyle(
                                         fontSize: 12,
-                                        color: Color(0xFF3DBE6E),
+                                        color: SonaColors.primary,
                                         fontWeight: FontWeight.w600)),
                                 const SizedBox(height: 8),
                                 _buildPhoto(true),
@@ -1496,7 +1433,7 @@ class ResultatScreen extends StatelessWidget {
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(
-                                    '${poidsCible.toStringAsFixed(1)} kg',
+                                    '${profile.poidsCible.toStringAsFixed(1)} kg',
                                     style: const TextStyle(
                                         fontSize: 13,
                                         fontWeight: FontWeight.w600,
@@ -1508,7 +1445,7 @@ class ResultatScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 12),
                           const Text(
-                            'Projection estimée basée sur le programme Zélios.\nRésultats individuels variables.',
+                            'Projection estimée basée sur le programme Sona.\nRésultats individuels variables.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
                                 fontSize: 11,
@@ -1534,13 +1471,13 @@ class ResultatScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 16),
                           _buildIndicateur('💨', 'Souffle',
-                              indicateurs['souffle']!, progress['souffle']!),
+                              profile.indicateurSouffle, progress['souffle']!),
                           const SizedBox(height: 12),
                           _buildIndicateur('⚡', 'Énergie',
-                              indicateurs['energie']!, progress['energie']!),
+                              profile.indicateurEnergie, progress['energie']!),
                           const SizedBox(height: 12),
                           _buildIndicateur('🩸', 'Glycémie',
-                              indicateurs['glycemie']!, progress['glycemie']!),
+                              profile.indicateurGlycemie, progress['glycemie']!),
                         ],
                       ),
                     ),
@@ -1702,9 +1639,9 @@ class ResultatScreen extends StatelessWidget {
                       onPressed: () =>
                           Navigator.of(context).popUntil((r) => r.isFirst),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF3DBE6E),
+                        foregroundColor: SonaColors.primary,
                         side: const BorderSide(
-                            color: Color(0xFF3DBE6E), width: 1.5),
+                            color: SonaColors.primary, width: 1.5),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(
@@ -1729,19 +1666,11 @@ class ResultatScreen extends StatelessWidget {
 // ─── ÉCRAN PROGRAMME ──────────────────────────────────────────────────────────
 
 class ProgrammeScreen extends StatefulWidget {
-  final String prenom;
-  final int age;
-  final double poids;
-  final double taille;
-  final String? photoPath;
+  final UserProfile profile;
 
   const ProgrammeScreen({
     super.key,
-    required this.prenom,
-    required this.age,
-    required this.poids,
-    required this.taille,
-    this.photoPath,
+    required this.profile,
   });
 
   @override
@@ -1756,13 +1685,10 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
   late String _calories;
   final _sportController = TextEditingController();
 
-  double get _imc =>
-      widget.poids / ((widget.taille / 100) * (widget.taille / 100));
-
   @override
   void initState() {
     super.initState();
-    final imc = _imc;
+    final imc = widget.profile.imc;
     _pas = imc >= 35 ? '3 000' : imc >= 30 ? '5 000' : imc >= 25 ? '7 500' : '10 000';
     _footing = imc >= 35 ? '1x' : imc >= 30 ? '2x' : '3x';
     _eau = imc >= 35 ? '1.5L' : '2L';
@@ -1787,10 +1713,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
       context,
       MaterialPageRoute(
         builder: (_) => ResultatProgrammeScreen(
-          prenom: widget.prenom,
-          poids: widget.poids,
-          taille: widget.taille,
-          age: widget.age,
+          profile: widget.profile,
           pas: _pas,
           footing: _footing,
           eau: _eau,
@@ -1868,7 +1791,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(children: [
                     const Icon(Icons.check_circle,
-                        color: Color(0xFF3DBE6E), size: 18),
+                        color: SonaColors.primary, size: 18),
                     const SizedBox(width: 10),
                     Expanded(
                         child: Text(f,
@@ -1889,7 +1812,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1D9E75),
+                  backgroundColor: SonaColors.primary,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14)),
@@ -1916,34 +1839,17 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     );
   }
 
-  String get _niveau {
-    final imc = _imc;
-    if (imc >= 35) return 'douceur';
-    if (imc >= 30) return 'actif';
-    if (imc >= 25) return 'tonification';
-    return 'maintien';
-  }
-
-  double get _poidsCible {
-    switch (_niveau) {
-      case 'douceur': return widget.poids * 0.96;
-      case 'actif': return widget.poids * 0.94;
-      case 'tonification': return widget.poids * 0.95;
-      default: return widget.poids * 0.98;
-    }
-  }
-
   Widget _buildPhoto(bool isAfter) {
-    final path = widget.photoPath;
+    final path = widget.profile.photoPath;
     if (path == null) {
       return Container(
         width: 140,
         height: 190,
         decoration: BoxDecoration(
-          color: const Color(0xFFE8F5EE),
+          color: SonaColors.primaryLight,
           borderRadius: BorderRadius.circular(16),
         ),
-        child: const Icon(Icons.person, size: 52, color: Color(0xFF3DBE6E)),
+        child: const Icon(Icons.person, size: 52, color: SonaColors.primary),
       );
     }
     final useNetwork = kIsWeb || path.startsWith('blob:') || path.startsWith('http');
@@ -1968,7 +1874,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color: const Color(0xFF3DBE6E).withOpacity(0.06),
+            color: SonaColors.primary.withOpacity(0.06),
           ),
         ),
       ),
@@ -2004,7 +1910,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${widget.poids.toStringAsFixed(1)} kg',
+                      '${widget.profile.poids.toStringAsFixed(1)} kg',
                       style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -2016,14 +1922,14 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8),
                 child: Icon(Icons.arrow_forward,
-                    color: Color(0xFF3DBE6E), size: 20),
+                    color: SonaColors.primary, size: 20),
               ),
               Expanded(
                 child: Column(children: [
                   const Text('Dans 3 mois',
                       style: TextStyle(
                           fontSize: 12,
-                          color: Color(0xFF3DBE6E),
+                          color: SonaColors.primary,
                           fontWeight: FontWeight.w600)),
                   const SizedBox(height: 8),
                   _buildPhoto(true),
@@ -2035,7 +1941,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
-                      '${_poidsCible.toStringAsFixed(1)} kg',
+                      '${widget.profile.poidsCible.toStringAsFixed(1)} kg',
                       style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
@@ -2111,20 +2017,20 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                         horizontal: 16, vertical: 9),
                     decoration: BoxDecoration(
                       color: sel
-                          ? const Color(0xFF1D9E75)
-                          : const Color(0xFFE8F5EE),
+                          ? SonaColors.primary
+                          : SonaColors.primaryLight,
                       borderRadius: BorderRadius.circular(20),
                       border: Border.all(
                         color: sel
-                            ? const Color(0xFF1D9E75)
-                            : const Color(0xFF5DCAA5),
+                            ? SonaColors.primary
+                            : SonaColors.primaryBorder,
                       ),
                     ),
                     child: Text(v,
                         style: TextStyle(
                           color: sel
                               ? Colors.white
-                              : const Color(0xFF0F6E56),
+                              : SonaColors.primaryDark,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         )),
@@ -2139,7 +2045,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: SonaColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -2229,7 +2135,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                           const SizedBox(height: 12),
                           Container(
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F5F5),
+                              color: SonaColors.background,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: TextField(
@@ -2255,7 +2161,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       child: ElevatedButton(
                         onPressed: _lancerProgramme,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF1D9E75),
+                          backgroundColor: SonaColors.primary,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14)),
@@ -2283,10 +2189,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
 // ─── ÉCRAN RÉSULTAT DU PROGRAMME ─────────────────────────────────────────────
 
 class ResultatProgrammeScreen extends StatelessWidget {
-  final String prenom;
-  final double poids;
-  final double taille;
-  final int age;
+  final UserProfile profile;
   final String pas;
   final String footing;
   final String eau;
@@ -2295,10 +2198,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
 
   const ResultatProgrammeScreen({
     super.key,
-    required this.prenom,
-    required this.poids,
-    required this.taille,
-    required this.age,
+    required this.profile,
     required this.pas,
     required this.footing,
     required this.eau,
@@ -2306,31 +2206,8 @@ class ResultatProgrammeScreen extends StatelessWidget {
     required this.calories,
   });
 
-  double get _imc => poids / ((taille / 100) * (taille / 100));
-
-  String get _niveau {
-    final imc = _imc;
-    if (imc >= 35) return 'douceur';
-    if (imc >= 30) return 'actif';
-    if (imc >= 25) return 'tonification';
-    return 'maintien';
-  }
-
-  Map<String, String> get _indicateurs {
-    switch (_niveau) {
-      case 'douceur':
-        return {'souffle': '+15%', 'energie': '+20%', 'glycemie': '-8%'};
-      case 'actif':
-        return {'souffle': '+25%', 'energie': '+35%', 'glycemie': '-12%'};
-      case 'tonification':
-        return {'souffle': '+30%', 'energie': '+40%', 'glycemie': '-10%'};
-      default:
-        return {'souffle': '+20%', 'energie': '+25%', 'glycemie': '-5%'};
-    }
-  }
-
   Map<String, double> get _progress {
-    switch (_niveau) {
+    switch (profile.niveau) {
       case 'douceur':
         return {'souffle': 0.38, 'energie': 0.40, 'glycemie': 0.53};
       case 'actif':
@@ -2385,7 +2262,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
                         style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
-                            color: Color(0xFF3DBE6E))),
+                            color: SonaColors.primary)),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -2409,7 +2286,6 @@ class ResultatProgrammeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final indicateurs = _indicateurs;
     final prog = _progress;
     final etapes = [
       ('Mois 1', 'Mise en route', 'Installer les habitudes'),
@@ -2418,7 +2294,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
     ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: SonaColors.background,
       body: SafeArea(
         child: Column(
           children: [
@@ -2487,7 +2363,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
                                       style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w700,
-                                          color: Color(0xFF1D9E75))),
+                                          color: SonaColors.primary)),
                                 ]),
                               )),
                         ],
@@ -2505,13 +2381,13 @@ class ResultatProgrammeScreen extends StatelessWidget {
                                   color: Color(0xFF0D4F3C))),
                           const SizedBox(height: 16),
                           _buildIndicateur('💨', 'Souffle',
-                              indicateurs['souffle']!, prog['souffle']!),
+                              profile.indicateurSouffle, prog['souffle']!),
                           const SizedBox(height: 12),
                           _buildIndicateur('⚡', 'Énergie',
-                              indicateurs['energie']!, prog['energie']!),
+                              profile.indicateurEnergie, prog['energie']!),
                           const SizedBox(height: 12),
                           _buildIndicateur('🩸', 'Glycémie',
-                              indicateurs['glycemie']!, prog['glycemie']!),
+                              profile.indicateurGlycemie, prog['glycemie']!),
                         ],
                       ),
                     ),
@@ -2538,7 +2414,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
                                     width: 32,
                                     height: 32,
                                     decoration: const BoxDecoration(
-                                        color: Color(0xFF1D9E75),
+                                        color: SonaColors.primary,
                                         shape: BoxShape.circle),
                                     child: Center(
                                       child: Text('${i + 1}',
@@ -2606,7 +2482,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
                             width: 40,
                             height: 40,
                             decoration: const BoxDecoration(
-                                color: Color(0xFFE8F5EE),
+                                color: SonaColors.primaryLight,
                                 shape: BoxShape.circle),
                             child: const Center(
                                 child: Text('⭐',
@@ -2632,7 +2508,7 @@ class ResultatProgrammeScreen extends StatelessWidget {
                             ),
                           ),
                           const Icon(Icons.chevron_right,
-                              color: Color(0xFF1D9E75)),
+                              color: SonaColors.primary),
                         ]),
                       ),
                     ),
@@ -2641,9 +2517,9 @@ class ResultatProgrammeScreen extends StatelessWidget {
                       onPressed: () => Navigator.of(context)
                           .popUntil((r) => r.isFirst),
                       style: OutlinedButton.styleFrom(
-                        foregroundColor: const Color(0xFF3DBE6E),
+                        foregroundColor: SonaColors.primary,
                         side: const BorderSide(
-                            color: Color(0xFF3DBE6E), width: 1.5),
+                            color: SonaColors.primary, width: 1.5),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14)),
                         padding: const EdgeInsets.symmetric(

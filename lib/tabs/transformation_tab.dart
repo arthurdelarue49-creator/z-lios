@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/user_profile.dart';
 
+typedef TransformationTab = ResultatScreen;
+
 class ResultatScreen extends StatelessWidget {
   final UserProfile profile;
 

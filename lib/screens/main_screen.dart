@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import '../theme.dart';
+import '../models/user_profile.dart';
+import '../tabs/accueil_tab.dart';
+import '../tabs/transformation_tab.dart';
+import '../tabs/progres_tab.dart';
+import '../tabs/profil_tab.dart';
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   final String prenom;
   final String sexe;
   final int age;
@@ -20,17 +24,72 @@ class MainScreen extends StatelessWidget {
   });
 
   @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+  late final UserProfile _profile;
+
+  @override
+  void initState() {
+    super.initState();
+    _profile = UserProfile(
+      prenom: widget.prenom,
+      sexe: widget.sexe,
+      age: widget.age,
+      poids: widget.poids,
+      taille: widget.taille,
+      photoPath: widget.photoPath,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final tabs = [
+      AccueilTab(
+        profile: _profile,
+        onTabChange: (i) => setState(() => _currentIndex = i),
+      ),
+      TransformationTab(profile: _profile),
+      ProgressTab(poids: _profile.poids, taille: _profile.taille, age: _profile.age),
+      ProfilTab(profile: _profile),
+    ];
+
     return Scaffold(
-      backgroundColor: SonaColors.background,
-      body: Center(
-        child: Text(
-          'Bonjour $prenom 👋',
-          style: const TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
-            color: Color(0xFF0F6E56),
-          ),
+      body: IndexedStack(index: _currentIndex, children: tabs),
+      bottomNavigationBar: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x14000000),
+              blurRadius: 12,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+          type: BottomNavigationBarType.fixed,
+          backgroundColor: Colors.white,
+          selectedItemColor: const Color(0xFF1D9E75),
+          unselectedItemColor: const Color(0xFFB0B0B0),
+          selectedFontSize: 11,
+          unselectedFontSize: 11,
+          elevation: 0,
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded), label: 'Accueil'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.photo_camera_rounded),
+                label: 'Transformation'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.bar_chart_rounded), label: 'Progrès'),
+            BottomNavigationBarItem(
+                icon: Icon(Icons.person_rounded), label: 'Profil'),
+          ],
         ),
       ),
     );

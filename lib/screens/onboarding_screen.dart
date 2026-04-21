@@ -57,9 +57,9 @@ class _SplashScreenState extends State<SplashScreen> {
     final profile = UserProfile(
       prenom: prenom,
       sexe: _sexe,
-      age: age!,
-      poids: poids!,
-      taille: taille!,
+      age: age,
+      poids: poids,
+      taille: taille,
     );
     Navigator.push(
       context,

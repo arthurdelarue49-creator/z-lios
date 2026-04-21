@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/user_profile.dart';
 
+typedef ProgrammeTab = ProgrammeScreen;
+
 // ─── ÉCRAN PROGRAMME ─────────────────────────────────────────────────────────
 
 class ProgrammeScreen extends StatefulWidget {

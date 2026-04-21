@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../theme.dart';
 import 'main_screen.dart';
 
 class LoadingScreen extends StatefulWidget {

@@ -53,7 +53,13 @@ class _MainScreenState extends State<MainScreen> {
       ),
       TransformationTab(profile: _profile),
       ProgressTab(poids: _profile.poids, taille: _profile.taille, age: _profile.age),
-      ProfilTab(profile: _profile),
+      ProfilTab(
+        prenom: _profile.prenom,
+        sexe: _profile.sexe,
+        age: _profile.age,
+        poids: _profile.poids,
+        taille: _profile.taille,
+      ),
     ];
 
     return Scaffold(

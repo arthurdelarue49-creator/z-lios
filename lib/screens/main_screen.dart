@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/user_profile.dart';
 import '../tabs/accueil_tab.dart';
+import '../tabs/programme_tab.dart';
 import '../tabs/transformation_tab.dart';
-import '../tabs/progres_tab.dart';
 import '../tabs/profil_tab.dart';
 
 class MainScreen extends StatefulWidget {
@@ -51,8 +51,8 @@ class _MainScreenState extends State<MainScreen> {
         profile: _profile,
         onTabChange: (i) => setState(() => _currentIndex = i),
       ),
+      ProgrammeTab(profile: _profile),
       TransformationTab(profile: _profile),
-      ProgressTab(poids: _profile.poids, taille: _profile.taille, age: _profile.age),
       ProfilTab(
         prenom: _profile.prenom,
         sexe: _profile.sexe,
@@ -89,10 +89,10 @@ class _MainScreenState extends State<MainScreen> {
             BottomNavigationBarItem(
                 icon: Icon(Icons.home_rounded), label: 'Accueil'),
             BottomNavigationBarItem(
+                icon: Icon(Icons.list_alt_rounded), label: 'Programme'),
+            BottomNavigationBarItem(
                 icon: Icon(Icons.photo_camera_rounded),
                 label: 'Transformation'),
-            BottomNavigationBarItem(
-                icon: Icon(Icons.bar_chart_rounded), label: 'Progrès'),
             BottomNavigationBarItem(
                 icon: Icon(Icons.person_rounded), label: 'Profil'),
           ],

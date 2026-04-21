@@ -24,9 +24,9 @@ class AccueilTab extends StatelessWidget {
     return '${days[now.weekday - 1]} ${now.day} ${months[now.month - 1]}';
   }
 
-  String get _pas {
+  String get _marche {
     final i = profile.imc;
-    return i >= 35 ? '3 000' : i >= 30 ? '5 000' : i >= 25 ? '7 500' : '10 000';
+    return i >= 35 ? '15 min' : i >= 30 ? '30 min' : i >= 25 ? '45 min' : '1h';
   }
 
   String get _eau => profile.imc >= 35 ? '1.5' : '2';
@@ -107,7 +107,7 @@ class AccueilTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final objectifs = [
-      ('🚶', 'Marche', '$_pas pas aujourd\'hui'),
+      ('🚶', 'Marche', '$_marche aujourd\'hui'),
       ('💧', 'Eau', '$_eau L d\'eau'),
       ('🍽️', 'Calories', '$_cal kcal max'),
       ('😴', 'Sommeil', '7h cette nuit'),
@@ -169,7 +169,7 @@ class AccueilTab extends StatelessWidget {
 
               // ── SECTION 2 : AVANT/APRÈS ──
               GestureDetector(
-                onTap: () => onTabChange(1),
+                onTap: () => onTabChange(2),
                 child: _buildCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,7 +314,7 @@ class AccueilTab extends StatelessWidget {
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
-                  onPressed: () => onTabChange(2),
+                  onPressed: () => onTabChange(1),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFF1D9E75),
                     side: const BorderSide(

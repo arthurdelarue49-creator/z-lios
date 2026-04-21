@@ -69,12 +69,12 @@ class UserProfile {
     }
   }
 
-  String get pasParJour {
+  String get tempsMarche {
     switch (niveau) {
-      case 'douceur': return '3 000';
-      case 'actif': return '5 000';
-      case 'tonification': return '7 500';
-      default: return '10 000';
+      case 'douceur':      return '15 min';
+      case 'actif':        return '30 min';
+      case 'tonification': return '45 min';
+      default:             return '1h';
     }
   }
 

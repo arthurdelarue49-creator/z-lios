@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -438,78 +437,6 @@ class _ProgressTabState extends State<ProgressTab> {
                 ),
               ),
 
-              // ── S5 : Projections premium floutées ──
-              _buildCard(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: Stack(children: [
-                    Opacity(
-                      opacity: 0.4,
-                      child: Container(
-                        height: 160,
-                        decoration: const BoxDecoration(
-                            color: Color(0xFFE8F5EE)),
-                        child: const Center(
-                          child: Icon(Icons.show_chart,
-                              size: 80, color: Color(0xFF5DCAA5)),
-                        ),
-                      ),
-                    ),
-                    Positioned.fill(
-                      child: BackdropFilter(
-                        filter:
-                            ImageFilter.blur(sigmaX: 6, sigmaY: 6),
-                        child: Container(
-                            color:
-                                Colors.white.withValues(alpha: 0.5)),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 160,
-                      child: Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('🔒',
-                                style: TextStyle(fontSize: 28)),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Projections 6 et 12 mois',
-                              style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0F6E56)),
-                            ),
-                            const SizedBox(height: 12),
-                            ElevatedButton(
-                              onPressed: () =>
-                                  ScaffoldMessenger.of(context)
-                                      .showSnackBar(const SnackBar(
-                                          content: Text(
-                                              '🚧 Paiement à venir !'))),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color(0xFF1D9E75),
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12)),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                elevation: 0,
-                              ),
-                              child: const Text(
-                                  'Débloquer les projections',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w700)),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ]),
-                ),
-              ),
             ],
           ),
         ),

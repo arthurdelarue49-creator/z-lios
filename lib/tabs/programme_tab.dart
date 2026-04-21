@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/user_profile.dart';
@@ -21,21 +19,28 @@ class ProgrammeScreen extends StatefulWidget {
 }
 
 class _ProgrammeScreenState extends State<ProgrammeScreen> {
-  late String _pas;
-  late String _footing;
+  // Obligatoires
+  late String _marche;
+  late String _calories;
   late String _eau;
   late String _sommeil;
-  late String _calories;
+
+  // Facultatifs (null = non sélectionné)
+  String? _seances;
+  String? _footing;
+  String? _repas;
+  String? _alcool;
+  String? _coucherH;
+  String? _stress;
+  String? _pesee;
+
   final _sportController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     final imc = widget.profile.imc;
-    _pas = imc >= 35 ? '3 000' : imc >= 30 ? '5 000' : imc >= 25 ? '7 500' : '10 000';
-    _footing = imc >= 35 ? '1x' : imc >= 30 ? '2x' : '3x';
-    _eau = imc >= 35 ? '1.5L' : '2L';
-    _sommeil = '7h';
+    _marche = imc >= 35 ? '15 min' : imc >= 30 ? '30 min' : imc >= 25 ? '45 min' : '1h';
     _calories = imc >= 35
         ? '1 400'
         : imc >= 30
@@ -43,6 +48,8 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
             : imc >= 25
                 ? '2 000'
                 : '2 300';
+    _eau = imc >= 35 ? '1.5L' : '2L';
+    _sommeil = '7h';
   }
 
   @override
@@ -51,260 +58,27 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     super.dispose();
   }
 
-  void _naviguerVersResultat() {
+  void _lancerProgramme() {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => ResultatProgrammeScreen(
           profile: widget.profile,
-          pas: _pas,
-          footing: _footing,
+          marche: _marche,
+          calories: _calories,
           eau: _eau,
           sommeil: _sommeil,
-          calories: _calories,
+          seances: _seances,
+          footing: _footing,
+          repas: _repas,
+          alcool: _alcool,
+          coucherH: _coucherH,
+          stress: _stress,
+          pesee: _pesee,
+          sport: _sportController.text.trim().isEmpty
+              ? null
+              : _sportController.text.trim(),
         ),
-      ),
-    );
-  }
-
-  void _lancerProgramme() {
-    final sport = _sportController.text.trim();
-    if (sport.isEmpty) {
-      _naviguerVersResultat();
-      return;
-    }
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.fromLTRB(
-            24, 16, 24, MediaQuery.of(ctx).viewInsets.bottom + 40),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: const Color(0xFFDDEEE5),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 20),
-            Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFD700),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text('⭐ PREMIUM',
-                  style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF7A5500),
-                      letterSpacing: 1)),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Un sport en plus, des résultats en plus',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF0D4F3C)),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "Ajouter '$sport' à ton programme et accéder aux projections avancées.",
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                  fontSize: 13, color: Color(0xFF8A9E94), height: 1.5),
-            ),
-            const SizedBox(height: 16),
-            ...[
-              "Sport '$sport' intégré au programme",
-              'Projections 6 et 12 mois débloquées',
-              'Suivi semaine par semaine',
-              "Programme d'entraînement personnalisé",
-            ].map((f) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(children: [
-                    const Icon(Icons.check_circle,
-                        color: SonaColors.primary, size: 18),
-                    const SizedBox(width: 10),
-                    Expanded(
-                        child: Text(f,
-                            style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF1A3D2B)))),
-                  ]),
-                )),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('🚧 Paiement à venir !')),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: SonaColors.primary,
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14)),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  elevation: 0,
-                ),
-                child: const Text('Débloquer — 4.99€/mois',
-                    style: TextStyle(
-                        fontSize: 15, fontWeight: FontWeight.w700)),
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                _naviguerVersResultat();
-              },
-              child: const Text('Continuer sans ce sport',
-                  style: TextStyle(color: Color(0xFF8A9E94))),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPhoto(bool isAfter) {
-    final path = widget.profile.photoPath;
-    if (path == null) {
-      return Container(
-        width: 140,
-        height: 190,
-        decoration: BoxDecoration(
-          color: SonaColors.primaryLight,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: const Icon(Icons.person, size: 52, color: SonaColors.primary),
-      );
-    }
-    final useNetwork = kIsWeb || path.startsWith('blob:') || path.startsWith('http');
-    final base = ClipRRect(
-      borderRadius: BorderRadius.circular(16),
-      child: useNetwork
-          ? Image.network(path, width: 140, height: 190, fit: BoxFit.cover)
-          : Image.file(File(path), width: 140, height: 190, fit: BoxFit.cover),
-    );
-    if (!isAfter) return base;
-    return Stack(children: [
-      ColorFiltered(
-        colorFilter: const ColorFilter.matrix([
-          1.05, 0, 0, 0, 10,
-          0, 1.05, 0, 0, 10,
-          0, 0, 1.05, 0, 10,
-          0, 0, 0, 1, 0,
-        ]),
-        child: base,
-      ),
-      Positioned.fill(
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: SonaColors.primary.withOpacity(0.06),
-          ),
-        ),
-      ),
-    ]);
-  }
-
-  Widget _buildAvantApres() {
-    return _buildCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Ta transformation en 3 mois',
-            style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF0D4F3C)),
-          ),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: Column(children: [
-                  const Text('Aujourd\'hui',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF8A9E94))),
-                  const SizedBox(height: 8),
-                  _buildPhoto(false),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF0F0F0),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${widget.profile.poids.toStringAsFixed(1)} kg',
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF555555)),
-                    ),
-                  ),
-                ]),
-              ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
-                child: Icon(Icons.arrow_forward,
-                    color: SonaColors.primary, size: 20),
-              ),
-              Expanded(
-                child: Column(children: [
-                  const Text('Dans 3 mois',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: SonaColors.primary,
-                          fontWeight: FontWeight.w600)),
-                  const SizedBox(height: 8),
-                  _buildPhoto(true),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFDDF5E8),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      '${widget.profile.poidsCible.toStringAsFixed(1)} kg',
-                      style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF1B8A4F)),
-                    ),
-                  ),
-                ]),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            'Projection estimée — résultats individuels variables.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                fontSize: 11,
-                color: Color(0xFF8A9E94),
-                fontStyle: FontStyle.italic),
-          ),
-        ],
       ),
     );
   }
@@ -318,7 +92,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -334,19 +108,71 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     String selected,
     void Function(String) onSelect,
   ) =>
+      _buildCategorieBase(
+        titre: titre,
+        sousTitre: sousTitre,
+        valeurs: valeurs,
+        selected: selected,
+        onTap: onSelect,
+        facultatif: false,
+      );
+
+  Widget _buildCategorieFacultatif(
+    String titre,
+    String sousTitre,
+    List<String> valeurs,
+    String? selected,
+    void Function(String?) onSelect,
+  ) =>
+      _buildCategorieBase(
+        titre: titre,
+        sousTitre: sousTitre,
+        valeurs: valeurs,
+        selected: selected,
+        onTapNullable: onSelect,
+        facultatif: true,
+      );
+
+  Widget _buildCategorieBase({
+    required String titre,
+    required String sousTitre,
+    required List<String> valeurs,
+    required String? selected,
+    void Function(String)? onTap,
+    void Function(String?)? onTapNullable,
+    required bool facultatif,
+  }) =>
       _buildCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(titre,
-                style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF0D4F3C))),
+            Row(children: [
+              Expanded(
+                child: Text(titre,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0D4F3C))),
+              ),
+              if (facultatif)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F0F0),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text('Facultatif',
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: Color(0xFF9E9E9E),
+                          fontWeight: FontWeight.w500)),
+                ),
+            ]),
             const SizedBox(height: 4),
             Text(sousTitre,
-                style: const TextStyle(
-                    fontSize: 12, color: Color(0xFF8A9E94))),
+                style:
+                    const TextStyle(fontSize: 12, color: Color(0xFF8A9E94))),
             const SizedBox(height: 12),
             Wrap(
               spacing: 8,
@@ -354,7 +180,13 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
               children: valeurs.map((v) {
                 final sel = v == selected;
                 return GestureDetector(
-                  onTap: () => onSelect(v),
+                  onTap: () {
+                    if (facultatif && onTapNullable != null) {
+                      onTapNullable(sel ? null : v);
+                    } else if (onTap != null) {
+                      onTap(v);
+                    }
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 9),
@@ -383,6 +215,16 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
             ),
           ],
         ),
+      );
+
+  Widget _buildSectionHeader(String text) => Padding(
+        padding: const EdgeInsets.only(bottom: 10, top: 4),
+        child: Text(text,
+            style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: Color(0xFF5A8A6A),
+                letterSpacing: 0.5)),
       );
 
   @override
@@ -424,22 +266,85 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildAvantApres(),
+                    // ── Bannière info ──
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(bottom: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5EE),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: const Color(0xFFB8DDC8), width: 1),
+                      ),
+                      child: const Row(children: [
+                        Text('💡', style: TextStyle(fontSize: 16)),
+                        SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            'Les champs facultatifs sont optionnels — ton programme de base est calculé automatiquement',
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: Color(0xFF3A6B50),
+                                height: 1.4),
+                          ),
+                        ),
+                      ]),
+                    ),
+
+                    // ── Section 1 : Activité physique ──
+                    _buildSectionHeader('🏃 Activité physique'),
                     _buildCategorie(
-                      'Nombre de pas / jour',
-                      'Objectif quotidien recommandé',
-                      ['3 000', '5 000', '7 500', '10 000'],
-                      _pas,
-                      (v) => setState(() => _pas = v),
+                      'Marche / jour',
+                      'Durée de marche quotidienne recommandée',
+                      ['15 min', '30 min', '45 min', '1h'],
+                      _marche,
+                      (v) => setState(() => _marche = v),
                     ),
                     _buildCategorie(
+                      'Calories / jour',
+                      'Objectif calorique indicatif',
+                      ['1 400', '1 700', '2 000', '2 300'],
+                      _calories,
+                      (v) => setState(() => _calories = v),
+                    ),
+                    _buildCategorieFacultatif(
+                      'Séances sport / semaine',
+                      'Nombre de séances en plus de la marche',
+                      ['1x', '2x', '3x', '4x'],
+                      _seances,
+                      (v) => setState(() => _seances = v),
+                    ),
+                    _buildCategorieFacultatif(
                       'Footing / semaine',
                       'Sorties course à pied',
                       ['1x', '2x', '3x', '4x'],
                       _footing,
                       (v) => setState(() => _footing = v),
                     ),
+
+                    // ── Section 2 : Nutrition ──
+                    _buildSectionHeader('🥗 Nutrition'),
+                    _buildCategorieFacultatif(
+                      'Repas / jour',
+                      'Nombre de repas quotidiens',
+                      ['2', '3', '4', '5'],
+                      _repas,
+                      (v) => setState(() => _repas = v),
+                    ),
+                    _buildCategorieFacultatif(
+                      'Alcool',
+                      'Consommation habituelle',
+                      ['Jamais', 'Rarement', 'Week-end', 'Souvent'],
+                      _alcool,
+                      (v) => setState(() => _alcool = v),
+                    ),
+
+                    // ── Section 3 : Récupération ──
+                    _buildSectionHeader('😴 Récupération'),
                     _buildCategorie(
                       'Eau / jour',
                       'Hydratation quotidienne',
@@ -454,27 +359,63 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       _sommeil,
                       (v) => setState(() => _sommeil = v),
                     ),
-                    _buildCategorie(
-                      'Calories / jour',
-                      'Objectif calorique indicatif',
-                      ['1 400', '1 700', '2 000', '2 300'],
-                      _calories,
-                      (v) => setState(() => _calories = v),
+                    _buildCategorieFacultatif(
+                      'Heure de coucher',
+                      'Heure à laquelle tu te couches',
+                      ['21h', '22h', '23h', '00h'],
+                      _coucherH,
+                      (v) => setState(() => _coucherH = v),
                     ),
+                    _buildCategorieFacultatif(
+                      'Niveau de stress',
+                      'Ressenti général en ce moment',
+                      ['Faible', 'Modéré', 'Élevé'],
+                      _stress,
+                      (v) => setState(() => _stress = v),
+                    ),
+
+                    // ── Section 4 : Suivi ──
+                    _buildSectionHeader('📊 Suivi'),
+                    _buildCategorieFacultatif(
+                      'Pesée',
+                      'Fréquence de pesée recommandée',
+                      ['1x/sem', '2x/sem', 'Quotidien'],
+                      _pesee,
+                      (v) => setState(() => _pesee = v),
+                    ),
+
+                    // ── Section 5 : Sport personnalisé ──
+                    _buildSectionHeader('🏋️ Sport supplémentaire'),
                     _buildCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Ajouter un sport',
-                              style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: Color(0xFF0D4F3C))),
+                          Row(children: [
+                            const Expanded(
+                              child: Text('Ajouter un sport',
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w700,
+                                      color: Color(0xFF0D4F3C))),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF0F0F0),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text('Facultatif',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      color: Color(0xFF9E9E9E),
+                                      fontWeight: FontWeight.w500)),
+                            ),
+                          ]),
                           const SizedBox(height: 4),
-                          const Text('Envie d\'aller plus loin ?',
+                          const Text('Piscine, vélo, yoga, musculation...',
                               style: TextStyle(
-                                  fontSize: 12,
-                                  color: Color(0xFF8A9E94))),
+                                  fontSize: 12, color: Color(0xFF8A9E94))),
                           const SizedBox(height: 12),
                           Container(
                             decoration: BoxDecoration(
@@ -498,7 +439,8 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 4),
+
+                    const SizedBox(height: 8),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -533,20 +475,34 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
 
 class ResultatProgrammeScreen extends StatelessWidget {
   final UserProfile profile;
-  final String pas;
-  final String footing;
+  final String marche;
+  final String calories;
   final String eau;
   final String sommeil;
-  final String calories;
+  final String? seances;
+  final String? footing;
+  final String? repas;
+  final String? alcool;
+  final String? coucherH;
+  final String? stress;
+  final String? pesee;
+  final String? sport;
 
   const ResultatProgrammeScreen({
     super.key,
     required this.profile,
-    required this.pas,
-    required this.footing,
+    required this.marche,
+    required this.calories,
     required this.eau,
     required this.sommeil,
-    required this.calories,
+    this.seances,
+    this.footing,
+    this.repas,
+    this.alcool,
+    this.coucherH,
+    this.stress,
+    this.pesee,
+    this.sport,
   });
 
   Map<String, double> get _progress {
@@ -565,12 +521,13 @@ class ResultatProgrammeScreen extends StatelessWidget {
   Widget _buildCard({required Widget child}) => Container(
         width: double.infinity,
         padding: const EdgeInsets.all(20),
+        margin: const EdgeInsets.only(bottom: 12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 16,
               offset: const Offset(0, 4),
             ),
@@ -585,47 +542,67 @@ class ResultatProgrammeScreen extends StatelessWidget {
       tween: Tween(begin: 0, end: progress),
       duration: const Duration(milliseconds: 1500),
       curve: Curves.easeOut,
-      builder: (_, value, __) => Row(
-        children: [
-          Text(icon, style: const TextStyle(fontSize: 20)),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(label,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            color: Color(0xFF1A3D2B),
-                            fontWeight: FontWeight.w500)),
-                    Text(valeur,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: SonaColors.primary)),
-                  ],
-                ),
-                const SizedBox(height: 6),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(4),
-                  child: LinearProgressIndicator(
-                    value: value,
-                    backgroundColor: const Color(0xFFE8E8E8),
-                    valueColor:
-                        const AlwaysStoppedAnimation(Color(0xFF4CAF50)),
-                    minHeight: 8,
+      builder: (_, value, _) => Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(label,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              color: Color(0xFF1A3D2B),
+                              fontWeight: FontWeight.w500)),
+                      Text(valeur,
+                          style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: SonaColors.primary)),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: value,
+                      backgroundColor: const Color(0xFFE8E8E8),
+                      valueColor:
+                          const AlwaysStoppedAnimation(Color(0xFF4CAF50)),
+                      minHeight: 8,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
+
+  Widget _buildLigne(String icon, String label, String valeur) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Row(children: [
+          Text(icon, style: const TextStyle(fontSize: 18)),
+          const SizedBox(width: 10),
+          Expanded(
+              child: Text(label,
+                  style: const TextStyle(
+                      fontSize: 14, color: Color(0xFF1A3D2B)))),
+          Text(valeur,
+              style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: SonaColors.primary)),
+        ]),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -634,6 +611,26 @@ class ResultatProgrammeScreen extends StatelessWidget {
       ('Mois 1', 'Mise en route', 'Installer les habitudes'),
       ('Mois 2', 'Accélération', 'Le corps s\'adapte'),
       ('Mois 3', 'Transformation', 'Les vrais résultats arrivent'),
+    ];
+
+    // Lignes de base (obligatoires)
+    final lignesBase = [
+      ('🚶', 'Marche / jour', marche),
+      ('🍽️', 'Calories / jour', calories),
+      ('💧', 'Eau / jour', eau),
+      ('😴', 'Sommeil', sommeil),
+    ];
+
+    // Lignes facultatives sélectionnées
+    final lignesFac = <(String, String, String)>[
+      if (seances != null) ('🏋️', 'Séances sport', seances!),
+      if (footing != null) ('🏃', 'Footing', footing!),
+      if (repas != null) ('🍴', 'Repas / jour', repas!),
+      if (alcool != null) ('🍷', 'Alcool', alcool!),
+      if (coucherH != null) ('🌙', 'Coucher', coucherH!),
+      if (stress != null) ('🧘', 'Stress', stress!),
+      if (pesee != null) ('⚖️', 'Pesée', pesee!),
+      if (sport != null) ('🎯', 'Sport', sport!),
     ];
 
     return Scaffold(
@@ -684,35 +681,16 @@ class ResultatProgrammeScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                   color: Color(0xFF0D4F3C))),
                           const SizedBox(height: 16),
-                          ...[
-                            ('🚶', 'Pas / jour', pas),
-                            ('🏃', 'Footing', footing),
-                            ('💧', 'Eau', eau),
-                            ('😴', 'Sommeil', sommeil),
-                            ('🍽️', 'Calories', calories),
-                          ].map((e) => Padding(
-                                padding: const EdgeInsets.only(bottom: 10),
-                                child: Row(children: [
-                                  Text(e.$1,
-                                      style:
-                                          const TextStyle(fontSize: 18)),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                      child: Text(e.$2,
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Color(0xFF1A3D2B)))),
-                                  Text(e.$3,
-                                      style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w700,
-                                          color: SonaColors.primary)),
-                                ]),
-                              )),
+                          ...lignesBase.map((e) => _buildLigne(e.$1, e.$2, e.$3)),
+                          if (lignesFac.isNotEmpty) ...[
+                            const Divider(
+                                height: 20, color: Color(0xFFF0F0F0)),
+                            ...lignesFac
+                                .map((e) => _buildLigne(e.$1, e.$2, e.$3)),
+                          ],
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
                     _buildCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -725,16 +703,13 @@ class ResultatProgrammeScreen extends StatelessWidget {
                           const SizedBox(height: 16),
                           _buildIndicateur('💨', 'Souffle',
                               profile.indicateurSouffle, prog['souffle']!),
-                          const SizedBox(height: 12),
                           _buildIndicateur('⚡', 'Énergie',
                               profile.indicateurEnergie, prog['energie']!),
-                          const SizedBox(height: 12),
                           _buildIndicateur('🩸', 'Glycémie',
                               profile.indicateurGlycemie, prog['glycemie']!),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
                     _buildCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -806,59 +781,9 @@ class ResultatProgrammeScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    GestureDetector(
-                      onTap: () =>
-                          ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                            content: Text('🚧 Paiement à venir !')),
-                      ),
-                      child: Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: const Color(0xFF5DCAA5), width: 1.5),
-                        ),
-                        child: Row(children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: const BoxDecoration(
-                                color: SonaColors.primaryLight,
-                                shape: BoxShape.circle),
-                            child: const Center(
-                                child: Text('⭐',
-                                    style: TextStyle(fontSize: 18))),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                    'Voir ta projection à 6 et 12 mois',
-                                    style: TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                        color: Color(0xFF0D4F3C))),
-                                Text(
-                                    'Sport personnalisé · Suivi avancé · 4.99€/mois',
-                                    style: TextStyle(
-                                        fontSize: 11,
-                                        color: Color(0xFF8A9E94))),
-                              ],
-                            ),
-                          ),
-                          const Icon(Icons.chevron_right,
-                              color: SonaColors.primary),
-                        ]),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
                     OutlinedButton(
-                      onPressed: () => Navigator.of(context)
-                          .popUntil((r) => r.isFirst),
+                      onPressed: () =>
+                          Navigator.of(context).popUntil((r) => r.isFirst),
                       style: OutlinedButton.styleFrom(
                         foregroundColor: SonaColors.primary,
                         side: const BorderSide(

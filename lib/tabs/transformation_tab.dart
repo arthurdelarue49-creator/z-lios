@@ -61,8 +61,8 @@ class TransformationTab extends StatelessWidget {
   Widget _buildPhoto(bool isAfter) {
     if (profile.photoPath == null) {
       return Container(
-        width: 160,
-        height: 210,
+        width: isAfter ? 140 : 160,
+        height: isAfter ? 185 : 210,
         decoration: BoxDecoration(
           color: SonaColors.primaryLight,
           borderRadius: BorderRadius.circular(16),
@@ -73,13 +73,15 @@ class TransformationTab extends StatelessWidget {
     final useNetwork = kIsWeb ||
         profile.photoPath!.startsWith('blob:') ||
         profile.photoPath!.startsWith('http');
+    final double w = isAfter ? 140 : 160;
+    final double h = isAfter ? 185 : 210;
     final base = ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: useNetwork
           ? Image.network(profile.photoPath!,
-              width: 160, height: 210, fit: BoxFit.cover)
+              width: w, height: h, fit: BoxFit.cover)
           : Image.file(File(profile.photoPath!),
-              width: 160, height: 210, fit: BoxFit.cover),
+              width: w, height: h, fit: BoxFit.cover),
     );
     if (!isAfter) return base;
     return Stack(children: [
@@ -107,6 +109,7 @@ class TransformationTab extends StatelessWidget {
         width: double.infinity,
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(20),
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),

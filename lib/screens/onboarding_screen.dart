@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 import '../models/user_profile.dart';
 import 'camera_screen.dart';
+import 'legal_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -16,6 +17,8 @@ class _SplashScreenState extends State<SplashScreen> {
   final _poidsController = TextEditingController();
   final _tailleController = TextEditingController();
   String _sexe = 'Femme';
+  bool _acceptedTerms = false;
+  bool _acceptedMarketing = false;
 
   void _validerEtContinuer(BuildContext context) {
     final prenom = _prenomController.text.trim();
@@ -252,6 +255,113 @@ class _SplashScreenState extends State<SplashScreen> {
 
               const SizedBox(height: 24),
 
+              // Cases à cocher légales
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  children: [
+                    // CGU + Politique de confidentialité
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Checkbox(
+                          value: _acceptedTerms,
+                          activeColor: SonaColors.primary,
+                          onChanged: (v) =>
+                              setState(() => _acceptedTerms = v ?? false),
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: Wrap(
+                              children: [
+                                const Text(
+                                  'J\'accepte que mes photos et données corporelles soient utilisées uniquement pour générer ma projection personnalisée. ',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF5A8A6A)),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LegalScreen(
+                                        title:
+                                            'Politique de confidentialité',
+                                        url:
+                                            'https://www.notion.so/348dae09b61b81c0a0f2c4fe1fb75d55',
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'Politique de confidentialité',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: SonaColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                                const Text(
+                                  ' · ',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: Color(0xFF5A8A6A)),
+                                ),
+                                GestureDetector(
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const LegalScreen(
+                                        title:
+                                            'Conditions générales d\'utilisation',
+                                        url:
+                                            'https://www.notion.so/348dae09b61b81f993d0f55ec9212551',
+                                      ),
+                                    ),
+                                  ),
+                                  child: const Text(
+                                    'CGU',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: SonaColors.primary,
+                                      fontWeight: FontWeight.w600,
+                                      decoration: TextDecoration.underline,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Marketing
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: _acceptedMarketing,
+                          activeColor: SonaColors.primary,
+                          onChanged: (v) =>
+                              setState(() => _acceptedMarketing = v ?? false),
+                        ),
+                        const Expanded(
+                          child: Text(
+                            'J\'accepte de recevoir des conseils et offres Sona par email',
+                            style: TextStyle(
+                                fontSize: 12, color: Color(0xFF5A8A6A)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
               // Bouton COMMENCER
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -259,13 +369,28 @@ class _SplashScreenState extends State<SplashScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: () => _validerEtContinuer(context),
+                    onPressed: () {
+                      if (!_acceptedTerms) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                                'Veuillez accepter les conditions pour continuer'),
+                            backgroundColor: Color(0xFFF57C00),
+                            behavior: SnackBarBehavior.floating,
+                          ),
+                        );
+                        return;
+                      }
+                      _validerEtContinuer(context);
+                    },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: SonaColors.primary,
+                      backgroundColor: _acceptedTerms
+                          ? SonaColors.primary
+                          : const Color(0xFFB0B0B0),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      elevation: 4,
+                      elevation: _acceptedTerms ? 4 : 0,
                       shadowColor: SonaColors.primary.withOpacity(0.4),
                     ),
                     child: const Text(
@@ -279,7 +404,28 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+
+              // Mentions légales
+              TextButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LegalScreen(
+                      title: 'Mentions légales',
+                      url:
+                          'https://www.notion.so/348dae09b61b81abbebaddfab86f641e',
+                    ),
+                  ),
+                ),
+                child: const Text(
+                  'Mentions légales',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: Color(0xFFB0B0B0),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
             ],
           ),
         ),

@@ -67,8 +67,8 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Zélios utilise votre caméra pour analyser votre posture et vous montrer votre évolution santé.</string>
+	<string>Sona utilise votre caméra pour analyser votre posture et vous montrer votre évolution santé.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Zélios accède à vos photos pour analyser votre posture et vous montrer votre évolution santé.</string>
+	<string>Sona accède à vos photos pour analyser votre posture et vous montrer votre évolution santé.</string>
 </dict>
 </plist>

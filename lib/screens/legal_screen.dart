@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../theme.dart';
+
+// webview_flutter is only available on mobile
+import 'legal_screen_webview.dart' if (dart.library.html) 'legal_screen_stub.dart';
 
 class LegalScreen extends StatelessWidget {
   final String title;
@@ -10,8 +14,23 @@ class LegalScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return _LegalScreenWeb(title: title, url: url);
+    }
+    return LegalScreenNative(title: title, url: url);
+  }
+}
+
+class _LegalScreenWeb extends StatelessWidget {
+  final String title;
+  final String url;
+
+  const _LegalScreenWeb({required this.title, required this.url});
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: SonaColors.background,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(title),
         backgroundColor: Colors.white,
@@ -38,7 +57,7 @@ class LegalScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Ce document s\'ouvre dans ton navigateur.',
+                'Ce document va s\'ouvrir dans votre navigateur.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
               ),

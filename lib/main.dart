@@ -3,11 +3,11 @@ import 'theme.dart';
 import 'screens/onboarding_screen.dart';
 
 void main() {
-  runApp(const ZeliosApp());
+  runApp(const SonaApp());
 }
 
-class ZeliosApp extends StatelessWidget {
-  const ZeliosApp({super.key});
+class SonaApp extends StatelessWidget {
+  const SonaApp({super.key});
 
   @override
   Widget build(BuildContext context) {

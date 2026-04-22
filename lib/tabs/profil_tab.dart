@@ -224,7 +224,7 @@ class ProfilTab extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (_) => const LegalScreen(
                                     title: 'Politique de confidentialité',
-                                    url: 'https://notion.so/politique-confidentialite',
+                                    url: 'https://www.notion.so/348dae09b61b81c0a0f2c4fe1fb75d55',
                                   )));
                     }),
                     const Divider(height: 1, color: Color(0xFFF0F0F0)),
@@ -234,7 +234,7 @@ class ProfilTab extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (_) => const LegalScreen(
                                     title: 'Conditions générales d\'utilisation',
-                                    url: 'https://notion.so/cgu',
+                                    url: 'https://www.notion.so/348dae09b61b81f993d0f55ec9212551',
                                   )));
                     }),
                     const Divider(height: 1, color: Color(0xFFF0F0F0)),
@@ -244,7 +244,7 @@ class ProfilTab extends StatelessWidget {
                           MaterialPageRoute(
                               builder: (_) => const LegalScreen(
                                     title: 'Mentions légales',
-                                    url: 'https://notion.so/mentions-legales',
+                                    url: 'https://www.notion.so/348dae09b61b81abbebaddfab86f641e',
                                   )));
                     }),
                     const Divider(height: 1, color: Color(0xFFF0F0F0)),

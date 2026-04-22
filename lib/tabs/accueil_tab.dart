@@ -95,11 +95,11 @@ class AccueilTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final objectifs = [
-      ('🚶', 'Marche', '$_marche aujourd\'hui'),
-      ('🏃', 'Cardio', '$_cardio cette semaine'),
-      ('💧', 'Eau', '$_eau aujourd\'hui'),
+      ('🚶', 'Marche', '$_marche / jour'),
+      ('🏃', 'Cardio', '$_cardio / semaine'),
+      ('💧', 'Eau', '$_eau / jour'),
       ('🍽️', 'Calories', '$_cal kcal max'),
-      ('😴', 'Sommeil', '7h cette nuit'),
+      ('😴', 'Sommeil', '7h / nuit'),
     ];
 
     return Scaffold(
@@ -298,7 +298,65 @@ class AccueilTab extends StatelessWidget {
                 ),
               ),
 
-              // ── SECTION 4 : BOUTON PERSONNALISER ──
+              // ── SECTION 4 : RÉSULTATS À 3 MOIS ──
+              _buildCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Tes résultats à 3 mois 📈',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF0F6E56),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    ...[
+                      ('⚖️', 'Poids visé',
+                          '${profile.poidsCible.toStringAsFixed(1)} kg'),
+                      ('⚡', 'Énergie', profile.indicateurEnergie),
+                    ].map((e) => Padding(
+                          padding: const EdgeInsets.only(bottom: 10),
+                          child: Row(children: [
+                            Text(e.$1,
+                                style: const TextStyle(fontSize: 18)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(e.$2,
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: Color(0xFF1A3D2B),
+                                    fontWeight: FontWeight.w500,
+                                  )),
+                            ),
+                            Text(e.$3,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w700,
+                                  color: SonaColors.primary,
+                                )),
+                          ]),
+                        )),
+                    const SizedBox(height: 4),
+                    Center(
+                      child: GestureDetector(
+                        onTap: () => onTabChange(2),
+                        child: const Text(
+                          'Voir tous tes résultats →',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: SonaColors.primary,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ── SECTION 5 : BOUTON PERSONNALISER ──
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(

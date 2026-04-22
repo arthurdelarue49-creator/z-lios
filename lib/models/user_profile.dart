@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 class UserProfile {
   final String prenom;
   final String sexe;
@@ -14,6 +16,34 @@ class UserProfile {
     required this.taille,
     this.photoPath,
   });
+
+  static Future<void> save(UserProfile profile) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('prenom', profile.prenom);
+    await prefs.setString('sexe', profile.sexe);
+    await prefs.setInt('age', profile.age);
+    await prefs.setDouble('poids', profile.poids);
+    await prefs.setDouble('taille', profile.taille);
+    if (profile.photoPath != null) {
+      await prefs.setString('photoPath', profile.photoPath!);
+    } else {
+      await prefs.remove('photoPath');
+    }
+  }
+
+  static Future<UserProfile?> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final prenom = prefs.getString('prenom');
+    if (prenom == null) return null;
+    return UserProfile(
+      prenom: prenom,
+      sexe: prefs.getString('sexe') ?? 'Femme',
+      age: prefs.getInt('age') ?? 25,
+      poids: prefs.getDouble('poids') ?? 70,
+      taille: prefs.getDouble('taille') ?? 170,
+      photoPath: prefs.getString('photoPath'),
+    );
+  }
 
   UserProfile copyWith({String? photoPath}) => UserProfile(
         prenom: prenom,

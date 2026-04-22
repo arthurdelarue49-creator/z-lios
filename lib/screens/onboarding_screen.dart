@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
   bool _acceptedTerms = false;
   bool _acceptedMarketing = false;
 
-  void _validerEtContinuer(BuildContext context) {
+  Future<void> _validerEtContinuer(BuildContext context) async {
     final prenom = _prenomController.text.trim();
     final ageStr = _ageController.text.trim();
     final poidsStr = _poidsController.text.trim();
@@ -64,6 +64,8 @@ class _SplashScreenState extends State<SplashScreen> {
       poids: poids,
       taille: taille,
     );
+    await UserProfile.save(profile);
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(

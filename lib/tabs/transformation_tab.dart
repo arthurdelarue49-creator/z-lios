@@ -59,10 +59,11 @@ class TransformationTab extends StatelessWidget {
   }
 
   Widget _buildPhoto(bool isAfter) {
+    const double h = 180;
     if (profile.photoPath == null) {
       return Container(
-        width: isAfter ? 140 : 160,
-        height: isAfter ? 185 : 210,
+        width: double.infinity,
+        height: h,
         decoration: BoxDecoration(
           color: SonaColors.primaryLight,
           borderRadius: BorderRadius.circular(16),
@@ -73,36 +74,36 @@ class TransformationTab extends StatelessWidget {
     final useNetwork = kIsWeb ||
         profile.photoPath!.startsWith('blob:') ||
         profile.photoPath!.startsWith('http');
-    final double w = isAfter ? 140 : 160;
-    final double h = isAfter ? 185 : 210;
     final base = ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: useNetwork
           ? Image.network(profile.photoPath!,
-              width: w, height: h, fit: BoxFit.cover)
+              width: double.infinity, height: h, fit: BoxFit.cover)
           : Image.file(File(profile.photoPath!),
-              width: w, height: h, fit: BoxFit.cover),
+              width: double.infinity, height: h, fit: BoxFit.cover),
     );
     if (!isAfter) return base;
-    return Stack(children: [
-      ColorFiltered(
-        colorFilter: const ColorFilter.matrix([
-          1.05, 0, 0, 0, 12,
-          0, 1.05, 0, 0, 12,
-          0, 0, 1.05, 0, 12,
-          0, 0, 0, 1, 0,
-        ]),
-        child: base,
-      ),
-      Positioned.fill(
-        child: Container(
+    return SizedBox(
+      width: double.infinity,
+      height: h,
+      child: Stack(fit: StackFit.expand, children: [
+        ColorFiltered(
+          colorFilter: const ColorFilter.matrix([
+            1.05, 0, 0, 0, 12,
+            0, 1.05, 0, 0, 12,
+            0, 0, 1.05, 0, 12,
+            0, 0, 0, 1, 0,
+          ]),
+          child: base,
+        ),
+        Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
             color: SonaColors.primary.withValues(alpha: 0.08),
           ),
         ),
-      ),
-    ]);
+      ]),
+    );
   }
 
   Widget _buildCard({required Widget child}) => Container(
@@ -187,58 +188,68 @@ class TransformationTab extends StatelessWidget {
                         color: Color(0xFF0F6E56))),
                 const SizedBox(height: 16),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Column(children: [
-                      const Text('Aujourd\'hui',
-                          style: TextStyle(fontSize: 12, color: Color(0xFF8A9E94))),
-                      const SizedBox(height: 8),
-                      _buildPhoto(false),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0F0F0),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${profile.poids.toStringAsFixed(1)} kg',
-                          style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF555555)),
-                        ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text('Aujourd\'hui',
+                              style: TextStyle(fontSize: 12, color: Color(0xFF8A9E94))),
+                          const SizedBox(height: 8),
+                          _buildPhoto(false),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFF0F0F0),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${profile.poids.toStringAsFixed(1)} kg',
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF555555)),
+                            ),
+                          ),
+                        ],
                       ),
-                    ]),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 12),
-                      child: Icon(Icons.arrow_forward,
-                          color: SonaColors.primary, size: 22),
                     ),
-                    Column(children: [
-                      const Text('Dans 3 mois',
-                          style: TextStyle(
-                              fontSize: 12,
-                              color: SonaColors.primary,
-                              fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 8),
-                      _buildPhoto(true),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFDDF5E8),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '${profile.poidsCible.toStringAsFixed(1)} kg',
-                          style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Color(0xFF1B8A4F)),
-                        ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Icon(Icons.arrow_forward,
+                          color: SonaColors.primary, size: 20),
+                    ),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Text('Dans 3 mois',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  color: SonaColors.primary,
+                                  fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 8),
+                          _buildPhoto(true),
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFDDF5E8),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              '${profile.poidsCible.toStringAsFixed(1)} kg',
+                              style: const TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Color(0xFF1B8A4F)),
+                            ),
+                          ),
+                        ],
                       ),
-                    ]),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),

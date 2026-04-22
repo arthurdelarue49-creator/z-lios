@@ -24,22 +24,10 @@ class AccueilTab extends StatelessWidget {
     return '${days[now.weekday - 1]} ${now.day} ${months[now.month - 1]}';
   }
 
-  String get _marche {
-    final i = profile.imc;
-    return i >= 35 ? '15 min' : i >= 30 ? '30 min' : i >= 25 ? '45 min' : '1h';
-  }
-
-  String get _eau => profile.imc >= 35 ? '1.5' : '2';
-
-  String get _cal {
-    final i = profile.imc;
-    return i >= 35 ? '1 400' : i >= 30 ? '1 700' : i >= 25 ? '2 000' : '2 300';
-  }
-
-  String get _foot {
-    final i = profile.imc;
-    return i >= 35 ? '1x' : i >= 30 ? '2x' : '3x';
-  }
+  String get _marche => profile.tempsMarche;
+  String get _cardio => profile.cardio;
+  String get _eau => profile.eauParJour;
+  String get _cal => profile.calories;
 
   Widget _buildPhoto(bool isAfter) {
     final path = profile.photoPath;
@@ -108,10 +96,10 @@ class AccueilTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final objectifs = [
       ('🚶', 'Marche', '$_marche aujourd\'hui'),
-      ('💧', 'Eau', '$_eau L d\'eau'),
+      ('🏃', 'Cardio', '$_cardio cette semaine'),
+      ('💧', 'Eau', '$_eau aujourd\'hui'),
       ('🍽️', 'Calories', '$_cal kcal max'),
       ('😴', 'Sommeil', '7h cette nuit'),
-      ('🏃', 'Footing', '$_foot /semaine'),
     ];
 
     return Scaffold(

@@ -26,7 +26,6 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
   late String _sommeil;
 
   // Facultatifs (null = non sélectionné)
-  String? _seances;
   String? _footing;
   String? _repas;
   String? _alcool;
@@ -35,6 +34,52 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
   String? _pesee;
 
   final _sportController = TextEditingController();
+  String _sportQuery = '';
+  // Each entry: {'label': '🏊 Natation', 'frequence': null | '1x/semaine' ...}
+  final List<Map<String, String?>> _selectedSports = [];
+
+  static const _sportsList = [
+    ('🏊', 'Natation'),
+    ('🚴', 'Vélo'),
+    ('🧘', 'Yoga'),
+    ('💪', 'Musculation'),
+    ('🏃', 'Running'),
+    ('⛹️', 'Basketball'),
+    ('⚽', 'Football'),
+    ('🎾', 'Tennis'),
+    ('🥊', 'Boxe'),
+    ('🏋️', 'CrossFit'),
+    ('🤸', 'Pilates'),
+    ('🏊', 'Aquagym'),
+    ('🧗', 'Escalade'),
+    ('🤼', 'Arts martiaux'),
+    ('🏇', 'Équitation'),
+    ('⛷️', 'Ski'),
+    ('🏄', 'Surf'),
+    ('🚣', 'Aviron'),
+    ('🤾', 'Handball'),
+    ('🏐', 'Volleyball'),
+    ('🏸', 'Badminton'),
+    ('🥋', 'Judo'),
+    ('🤺', 'Escrime'),
+    ('🏒', 'Hockey'),
+    ('🎿', 'Ski de fond'),
+    ('🏌️', 'Golf'),
+    ('🧶', 'Piloxing'),
+    ('🚵', 'VTT'),
+    ('🤽', 'Water-polo'),
+    ('🎯', 'Tir à l\'arc'),
+    ('🥌', 'Curling'),
+    ('🏂', 'Snowboard'),
+    ('🪂', 'Parachutisme'),
+    ('🤿', 'Plongée'),
+    ('🧁', 'Danse'),
+    ('🎪', 'Cirque'),
+    ('🏹', 'Tir sportif'),
+    ('🤼', 'Lutte'),
+    ('🚀', 'Zumba'),
+    ('🌊', 'Kitesurf'),
+  ];
 
   @override
   void initState() {
@@ -50,6 +95,8 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                 : '2 300';
     _eau = imc >= 35 ? '1.5L' : '2L';
     _sommeil = '7h';
+    _sportController.addListener(
+        () => setState(() => _sportQuery = _sportController.text.toLowerCase()));
   }
 
   @override
@@ -58,7 +105,13 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     super.dispose();
   }
 
-  void _lancerProgramme() {
+  void _naviguerVersResultat() {
+    final sportResume = _selectedSports.isEmpty
+        ? null
+        : _selectedSports
+            .map((s) =>
+                '${s['label']} (${s['frequence'] ?? 'fréquence libre'})')
+            .join(', ');
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -68,19 +121,112 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
           calories: _calories,
           eau: _eau,
           sommeil: _sommeil,
-          seances: _seances,
+          seances: null,
           footing: _footing,
           repas: _repas,
           alcool: _alcool,
           coucherH: _coucherH,
           stress: _stress,
           pesee: _pesee,
-          sport: _sportController.text.trim().isEmpty
-              ? null
-              : _sportController.text.trim(),
+          sport: sportResume,
         ),
       ),
     );
+  }
+
+  void _showPaywall(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                  color: const Color(0xFFE0E0E0),
+                  borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: const BoxDecoration(
+                  color: SonaColors.primaryLight, shape: BoxShape.circle),
+              child: const Icon(Icons.lock_rounded,
+                  color: SonaColors.primary, size: 30),
+            ),
+            const SizedBox(height: 16),
+            const Text('Sona Premium 🌿',
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF0F6E56))),
+            const SizedBox(height: 10),
+            const Text(
+              'Le suivi de sports personnalisés est une fonctionnalité Premium. Débloquez-la pour enrichir votre programme.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                  fontSize: 13,
+                  color: Color(0xFF5A8A6A),
+                  height: 1.5),
+            ),
+            const SizedBox(height: 28),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: SonaColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  elevation: 0,
+                ),
+                child: const Text('Débloquer Sona Premium',
+                    style: TextStyle(
+                        fontSize: 15, fontWeight: FontWeight.w700)),
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _naviguerVersResultat();
+              },
+              child: const Text('Continuer sans sport →',
+                  style:
+                      TextStyle(color: Color(0xFF9E9E9E), fontSize: 13)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _lancerProgramme() {
+    if (_selectedSports.isNotEmpty) {
+      _showPaywall(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Programme appliqué ✅'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Color(0xFF1D9E75),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      _naviguerVersResultat();
+    }
   }
 
   Widget _buildCard({required Widget child}) => Container(
@@ -114,7 +260,6 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
         valeurs: valeurs,
         selected: selected,
         onTap: onSelect,
-        facultatif: false,
       );
 
   Widget _buildCategorieFacultatif(
@@ -123,15 +268,93 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     List<String> valeurs,
     String? selected,
     void Function(String?) onSelect,
-  ) =>
-      _buildCategorieBase(
-        titre: titre,
-        sousTitre: sousTitre,
-        valeurs: valeurs,
-        selected: selected,
-        onTapNullable: onSelect,
-        facultatif: true,
-      );
+  ) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ExpansionTile(
+        initiallyExpanded: false,
+        tilePadding: const EdgeInsets.fromLTRB(20, 6, 16, 6),
+        childrenPadding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+        expandedCrossAxisAlignment: CrossAxisAlignment.start,
+        backgroundColor: Colors.transparent,
+        collapsedBackgroundColor: Colors.transparent,
+        trailing: const Icon(Icons.keyboard_arrow_down_rounded,
+            color: Color(0xFF5A8A6A)),
+        title: Row(children: [
+          Expanded(
+            child: Text(titre,
+                style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0D4F3C))),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0F0F0),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Text('Facultatif',
+                style: TextStyle(
+                    fontSize: 10,
+                    color: Color(0xFF9E9E9E),
+                    fontWeight: FontWeight.w500)),
+          ),
+          const SizedBox(width: 4),
+        ]),
+        children: [
+          Text(sousTitre,
+              style:
+                  const TextStyle(fontSize: 12, color: Color(0xFF8A9E94))),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: valeurs.map((v) {
+              final sel = v == selected;
+              return GestureDetector(
+                onTap: () => setState(() => onSelect(sel ? null : v)),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: sel
+                        ? SonaColors.primary
+                        : SonaColors.primaryLight,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: sel
+                          ? SonaColors.primary
+                          : SonaColors.primaryBorder,
+                    ),
+                  ),
+                  child: Text(v,
+                      style: TextStyle(
+                        color: sel ? Colors.white : SonaColors.primaryDark,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      )),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildCategorieBase({
     required String titre,
@@ -139,36 +362,16 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
     required List<String> valeurs,
     required String? selected,
     void Function(String)? onTap,
-    void Function(String?)? onTapNullable,
-    required bool facultatif,
   }) =>
       _buildCard(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(children: [
-              Expanded(
-                child: Text(titre,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF0D4F3C))),
-              ),
-              if (facultatif)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F0F0),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Text('Facultatif',
-                      style: TextStyle(
-                          fontSize: 10,
-                          color: Color(0xFF9E9E9E),
-                          fontWeight: FontWeight.w500)),
-                ),
-            ]),
+            Text(titre,
+                style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF0D4F3C))),
             const SizedBox(height: 4),
             Text(sousTitre,
                 style:
@@ -180,13 +383,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
               children: valeurs.map((v) {
                 final sel = v == selected;
                 return GestureDetector(
-                  onTap: () {
-                    if (facultatif && onTapNullable != null) {
-                      onTapNullable(sel ? null : v);
-                    } else if (onTap != null) {
-                      onTap(v);
-                    }
-                  },
+                  onTap: () => onTap?.call(v),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 9),
@@ -203,9 +400,7 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                     ),
                     child: Text(v,
                         style: TextStyle(
-                          color: sel
-                              ? Colors.white
-                              : SonaColors.primaryDark,
+                          color: sel ? Colors.white : SonaColors.primaryDark,
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                         )),
@@ -312,13 +507,6 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       (v) => setState(() => _calories = v),
                     ),
                     _buildCategorieFacultatif(
-                      'Séances sport / semaine',
-                      'Nombre de séances en plus de la marche',
-                      ['1x', '2x', '3x', '4x'],
-                      _seances,
-                      (v) => setState(() => _seances = v),
-                    ),
-                    _buildCategorieFacultatif(
                       'Footing / semaine',
                       'Sorties course à pied',
                       ['1x', '2x', '3x', '4x'],
@@ -390,33 +578,103 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Row(children: [
-                            const Expanded(
-                              child: Text('Ajouter un sport',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w700,
-                                      color: Color(0xFF0D4F3C))),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF0F0F0),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text('Facultatif',
-                                  style: TextStyle(
-                                      fontSize: 10,
-                                      color: Color(0xFF9E9E9E),
-                                      fontWeight: FontWeight.w500)),
-                            ),
-                          ]),
-                          const SizedBox(height: 4),
-                          const Text('Piscine, vélo, yoga, musculation...',
+                          // Titre + mention
+                          const Text('Ajouter un sport',
                               style: TextStyle(
-                                  fontSize: 12, color: Color(0xFF8A9E94))),
-                          const SizedBox(height: 12),
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w700,
+                                  color: Color(0xFF0D4F3C))),
+                          const SizedBox(height: 2),
+                          const Text('(facultatif — Premium)',
+                              style: TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFF9E9E9E))),
+                          const SizedBox(height: 14),
+
+                          // ── Sports sélectionnés ──
+                          ..._selectedSports.asMap().entries.map((entry) {
+                            final i = entry.key;
+                            final sport = entry.value;
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
+                                    decoration: BoxDecoration(
+                                      color: SonaColors.primary,
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Row(children: [
+                                      Expanded(
+                                        child: Text(sport['label']!,
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 14)),
+                                      ),
+                                      GestureDetector(
+                                        onTap: () => setState(
+                                            () => _selectedSports.removeAt(i)),
+                                        child: const Icon(Icons.close,
+                                            color: Colors.white70, size: 18),
+                                      ),
+                                    ]),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
+                                    children: [
+                                      '1x/semaine',
+                                      '2x/semaine',
+                                      '3x/semaine',
+                                      '4x/semaine',
+                                    ].map((f) {
+                                      final sel = sport['frequence'] == f;
+                                      return GestureDetector(
+                                        onTap: () => setState(() =>
+                                            _selectedSports[i]['frequence'] =
+                                                sel ? null : f),
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 12, vertical: 6),
+                                          decoration: BoxDecoration(
+                                            color: sel
+                                                ? SonaColors.primary
+                                                    .withValues(alpha: 0.12)
+                                                : SonaColors.primaryLight,
+                                            borderRadius:
+                                                BorderRadius.circular(16),
+                                            border: Border.all(
+                                              color: sel
+                                                  ? SonaColors.primary
+                                                  : SonaColors.primaryBorder,
+                                            ),
+                                          ),
+                                          child: Text(f,
+                                              style: TextStyle(
+                                                color: sel
+                                                    ? SonaColors.primary
+                                                    : SonaColors.primaryDark,
+                                                fontWeight: sel
+                                                    ? FontWeight.w700
+                                                    : FontWeight.w500,
+                                                fontSize: 12,
+                                              )),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+
+                          // ── Champ de recherche ──
                           Container(
                             decoration: BoxDecoration(
                               color: SonaColors.background,
@@ -424,18 +682,86 @@ class _ProgrammeScreenState extends State<ProgrammeScreen> {
                             ),
                             child: TextField(
                               controller: _sportController,
-                              decoration: const InputDecoration(
-                                hintText: 'Ex: piscine, vélo, yoga...',
-                                hintStyle: TextStyle(
+                              decoration: InputDecoration(
+                                hintText: 'Rechercher un sport...',
+                                hintStyle: const TextStyle(
                                     color: Color(0xFFAACCBB), fontSize: 14),
                                 border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
+                                contentPadding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 14),
+                                suffixIcon: _sportQuery.isNotEmpty
+                                    ? IconButton(
+                                        icon: const Icon(Icons.clear,
+                                            size: 18,
+                                            color: Color(0xFF9E9E9E)),
+                                        onPressed: () =>
+                                            _sportController.clear(),
+                                      )
+                                    : null,
                               ),
                               style: const TextStyle(
                                   fontSize: 14, color: Color(0xFF1A3D2B)),
                             ),
                           ),
+
+                          // ── Suggestions filtrées ──
+                          if (_sportQuery.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            Builder(builder: (_) {
+                              final already = _selectedSports
+                                  .map((s) => s['label'])
+                                  .toSet();
+                              final suggestions = _sportsList
+                                  .where((s) =>
+                                      s.$2
+                                          .toLowerCase()
+                                          .contains(_sportQuery) &&
+                                      !already.contains('${s.$1} ${s.$2}'))
+                                  .toList();
+                              if (suggestions.isEmpty) {
+                                return const Padding(
+                                  padding: EdgeInsets.only(top: 4),
+                                  child: Text('Aucun sport trouvé.',
+                                      style: TextStyle(
+                                          fontSize: 12,
+                                          color: Color(0xFF9E9E9E))),
+                                );
+                              }
+                              return Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: suggestions.map((s) {
+                                  final label = '${s.$1} ${s.$2}';
+                                  return GestureDetector(
+                                    onTap: () => setState(() {
+                                      _selectedSports.add({
+                                        'label': label,
+                                        'frequence': null,
+                                      });
+                                      _sportController.clear();
+                                    }),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 14, vertical: 8),
+                                      decoration: BoxDecoration(
+                                        color: SonaColors.primaryLight,
+                                        borderRadius:
+                                            BorderRadius.circular(20),
+                                        border: Border.all(
+                                            color: SonaColors.primaryBorder),
+                                      ),
+                                      child: Text(label,
+                                          style: const TextStyle(
+                                            color: SonaColors.primaryDark,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 13,
+                                          )),
+                                    ),
+                                  );
+                                }).toList(),
+                              );
+                            }),
+                          ],
                         ],
                       ),
                     ),

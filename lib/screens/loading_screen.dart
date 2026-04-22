@@ -49,11 +49,11 @@ class _LoadingScreenState extends State<LoadingScreen>
       CurvedAnimation(parent: _bounceController, curve: Curves.easeInOut),
     );
 
-    _textTimer = Timer.periodic(const Duration(milliseconds: 800), (_) {
+    _textTimer = Timer.periodic(const Duration(milliseconds: 1750), (_) {
       if (mounted) setState(() => _textIndex = (_textIndex + 1) % _texts.length);
     });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 7), () {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
@@ -141,7 +141,7 @@ class _LoadingScreenState extends State<LoadingScreen>
             const SizedBox(height: 20),
             TweenAnimationBuilder<double>(
               tween: Tween(begin: 0, end: 1),
-              duration: const Duration(seconds: 3),
+              duration: const Duration(seconds: 7),
               curve: Curves.easeInOut,
               builder: (_, value, __) => ClipRRect(
                 borderRadius: BorderRadius.circular(2),

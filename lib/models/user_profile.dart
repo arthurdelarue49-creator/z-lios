@@ -72,23 +72,35 @@ class UserProfile {
   String get tempsMarche {
     switch (niveau) {
       case 'douceur':      return '15 min';
-      case 'actif':        return '30 min';
-      case 'tonification': return '45 min';
-      default:             return '1h';
+      case 'actif':        return '20 min';
+      case 'tonification': return '30 min';
+      default:             return '45 min';
+    }
+  }
+
+  String get cardio {
+    switch (niveau) {
+      case 'douceur':      return '1x/sem';
+      case 'actif':        return '2x/sem';
+      case 'tonification': return '3x/sem';
+      default:             return '2x/sem';
     }
   }
 
   String get eauParJour {
-    if (imc >= 35) return '1.5L';
-    return '2L';
+    switch (niveau) {
+      case 'douceur': return '1.5L';
+      case 'actif':   return '1.5L';
+      default:        return '2L';
+    }
   }
 
   String get calories {
     switch (niveau) {
-      case 'douceur': return '1 400';
-      case 'actif': return '1 700';
-      case 'tonification': return '2 000';
-      default: return '2 300';
+      case 'douceur':      return '1 400';
+      case 'actif':        return '1 600';
+      case 'tonification': return '1 800';
+      default:             return '2 000';
     }
   }
 }
